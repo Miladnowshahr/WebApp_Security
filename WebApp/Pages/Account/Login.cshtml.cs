@@ -24,7 +24,7 @@ namespace WebApp.Pages.Account
             if (ModelState.IsValid is false) return Page();
 
             var result = await _signInManager.PasswordSignInAsync(Credential.UserName,
-                    Credential.Password,Credential.RememberMe,false
+                    Credential.Password, Credential.RememberMe, false
                 );
 
             if (result.Succeeded)
@@ -33,6 +33,14 @@ namespace WebApp.Pages.Account
             }
             else
             {
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("/Account/LoginTwoFactor", new
+                    {
+                        Email = Credential.UserName,
+                        RememberMe = Credential.RememberMe
+                    });
+                }
                 if (result.IsLockedOut)
                 {
                     ModelState.AddModelError("login", "You are locked out");
